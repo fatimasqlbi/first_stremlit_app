@@ -1,3 +1,1 @@
-import streamlit
-
-streamlit.tittle('My Parents New Healthy Dinner')
+This is my first streamlit app. 
