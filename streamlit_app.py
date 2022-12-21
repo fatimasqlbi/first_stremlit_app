@@ -44,7 +44,14 @@ my_cur = my_cnx.cursor()
 #adding initial code for future reference. 
 #my_cur.execute("SELECT CURRENT_USER(), CURRENT_ACCOUNT(), CURRENT_REGION()")
 my_cur.execute("SELECT * From fruit_load_list")
-my_data_row = my_cur.fetchone()
-#streamlit.text("Hello from Snowflake:")
-streamlit.text("The fruit load list contain:")
-streamlit.text(my_data_row)
+
+# version 1 - streamlit.text("Hello from Snowflake:")
+# version 2 - below
+#streamlit.text("The fruit load list contain:")
+#streamlit.text(my_data_row)
+#version 3 #Change the Streamlit Components to Make Things Look a Little Nicer and get all rows.
+my_data_rows = my_cur.fetchall()
+streamlit.header("The fruit load list contain:")
+streamlit.dataframe(my_data_rows)
+
+
