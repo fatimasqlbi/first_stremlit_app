@@ -25,6 +25,12 @@ fruits_to_show = my_fruit_list.loc[fruits_selected]
 #display the table
 streamlit.dataframe(fruits_to_show)
 
+#create the repeatable code block (called a function)
+def get_fruityvice_data(this_fruit_choice):
+       fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_choice)
+       fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
+       return fruityvice_normalized
+   
 #New Section to display fruityvice api response
 streamlit.header("Fruityvice Fruit Advice!")
 try:
@@ -32,34 +38,52 @@ try:
    if not fruit_choice:
       streamlit.error("Please select a fruit to get information.")
    else:
-       fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_choice)
-       fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
+       back_from_function = get_fruityvice_data(fruit_choice)
        streamlit.dataframe(fruityvice_normalized)
 except URLError as e:
     streamlit.error()
-        
-streamlit.write('The user entered ', fruit_choice)
 
-streamlit.stop()
 
-my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+streamlit.header("The fruit load list contain:")
+#snowflake related function
+def get_fruit_load_list(): 
+    with my_cnx.cursor() as my_cur:
+         my_cur.execute("SELECT * From fruit_load_list")
+         return my_cur.fetchall()
+      
+# Add a button to load the fruit
+If streamlit.button('Get Fruit Load List'):
+   my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+   my_data_rows = get_fruit_load_list()
+   streamlit.dataframe(my_data_rows)
+   streamlit.stop()
+   
+#Allow end user to add a fruit to list. 
+def insert_row_snowflake(new_fruit):
+   with my_cnx.corsor() as my_cur:
+      
+add_my_fruit = streamlit.text_input('What fruit would you like to add?')
+if streanlit.button('Add a Fruit to the List'):
+   my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+   back_from_function = insert_row_snowflake(add_my_fruit)
+   steamlit.text(back_from_function)
+   
+   
+streamlit.write('Thanks for adding', add_my_fruit)
+
+#this wi not work but lets just go with it. 
+my_cur.execute("insert into fruit_load_list values ('from streamlist')")
+   
+   
 my_cur = my_cnx.cursor()
-#adding initial code for future reference. 
-#my_cur.execute("SELECT CURRENT_USER(), CURRENT_ACCOUNT(), CURRENT_REGION()")
 my_cur.execute("SELECT * From fruit_load_list")
-
-# version 1 - streamlit.text("Hello from Snowflake:")
-# version 2 - below
-#streamlit.text("The fruit load list contain:")
-#streamlit.text(my_data_row)
-#version 3 #Change the Streamlit Components to Make Things Look a Little Nicer and get all rows.
 my_data_rows = my_cur.fetchall()
 streamlit.header("The fruit load list contain:")
 streamlit.dataframe(my_data_rows)
 
 #Allow the end user to add a fruit to list 
-add_my_fruit = streamlit.text_input('What fruit would you like to add?','jackfruit')
-streamlit.write('Thanks for adding', add_my_fruit)
+
+
 
 #copy it into your streamlit file and change the word "test" to "from streamlit" so you know where the row comes from. This wil not be correct. 
 my_cur.execute("insert into fruit_load_list values ('from streamlist')")
