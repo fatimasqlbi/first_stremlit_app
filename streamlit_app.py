@@ -58,3 +58,5 @@ streamlit.dataframe(my_data_rows)
 add_my_fruit = streamlit.text_input('What fruit would you like to add?','jackfruit')
 streamlit.write('Thanks for adding', add_my_fruit)
 
+#copy it into your streamlit file and change the word "test" to "from streamlit" so you know where the row comes from. This wil not be correct. 
+my_cur.execute("insert into fruit_load_list values ('from streamlist')")
